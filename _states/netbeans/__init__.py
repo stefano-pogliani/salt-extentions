@@ -7,6 +7,31 @@ def __virtual__():
   return "netbeans.exceptions" in __salt__
 
 
+def _check_version(version):
+  """Checks a version for validiti and converts latest to an actual version.
+
+  version:
+    The version to check.
+  """
+  # Update cache if needed.
+  if _check_version._versions_cache is None:
+    _check_version._versions_cache = __salt__["netbeans.list_versions"]()
+
+  # Convert latest.
+  if version == "latest":
+    return __salt__["netbeans.pick_latest_version"](
+        _check_version._versions_cache
+    )
+
+  # Check if version is available.
+  if version not in _check_version._versions_cache:
+    return None
+  return version
+
+# Module level version cache.
+_check_version._versions_cache = None
+
+
 def install(name, version, features='', source_url=None):
   """Installs the named version of NetBeans on the system.
 
@@ -37,9 +62,16 @@ def install(name, version, features='', source_url=None):
     "name":    name,
     "result":  False
   }
-  # Resolve 'latest' version.
+
+  # Resolve version.
+  resolved_version = _check_version(version)
+  if resolved_version is not None:
+    version = resolved_version
 
   # Look for existing installation.
+  # Look even for invalid versions because it could be a
+  # locally installed version that is not available on the
+  # specified source.
   exceptions = __salt__["netbeans.exceptions"]()
   try:
     found = __salt__["netbeans.find_installation"](version)
@@ -51,6 +83,12 @@ def install(name, version, features='', source_url=None):
   
   except exceptions["NoInstallFound"]:
     pass
+
+  # Check if the version is valid.
+  if resolved_version is None:
+    result["comment"] = "Invalid version {ver}.".format(ver=version)
+    result["result"]  = False
+    return result
 
   # Download installer.
   installer = None

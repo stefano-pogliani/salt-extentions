@@ -82,3 +82,13 @@ def test_found_right_version(mock_salt_test, mock_salt_demo):
   netbeans.__salt__ = {"cmd.retcode": cmdmod.retcode}
   path = netbeans.find_installation("salt-test", root=tempfile.tempdir)
   assert path == mock_salt_test
+
+
+class TestPickLatestVersion(object):
+  def test_pick_first(self):
+    latest = netbeans.pick_latest_version(['1.2.3', '0'])
+    assert latest == '1.2.3'
+
+  def test_pick_last(self):
+    latest = netbeans.pick_latest_version(['0', '0.1.2', '1.2.3'])
+    assert latest == '1.2.3'

@@ -54,23 +54,6 @@ def __virtual__():
   return __virtualname__
 
 
-def _pick_latest_version(versions):
-  """Returns the higher version available in the given list of versions.
-
-  versions:
-    Array of strings with the availalbe versions.
-  """
-  def from_string(version):
-    return tuple(int(part) for part in version.split('.'))
-
-  def to_string(version):
-    return '.'.join(str(part) for part in version)
-
-  int_versions = [from_string(version) for version in versions]
-  latest = max(int_versions)
-  return to_string(latest)
-
-
 def _get_installer_url(version, features='', url=None):
   """Returns the URL from which the installed can be downloaded.
 
@@ -236,3 +219,20 @@ def list_versions(url=None):
       versions.append(match.group(1))
       
   return versions
+
+
+def pick_latest_version(versions):
+  """Returns the higher version available in the given list of versions.
+
+  versions:
+    Array of strings with the availalbe versions.
+  """
+  def from_string(version):
+    return tuple(int(part) for part in version.split('.'))
+
+  def to_string(version):
+    return '.'.join(str(part) for part in version)
+
+  int_versions = [from_string(version) for version in versions]
+  latest = max(int_versions)
+  return to_string(latest)
