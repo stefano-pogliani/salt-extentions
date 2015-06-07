@@ -174,7 +174,7 @@ def find_installation(version, root='/'):
     unpack_path = tempfile.mkdtemp()
     try:
       # Unpack splash tranlation file.
-      unpack_code = __salt__["cmdmod.retcode"](
+      unpack_code = __salt__["cmd.retcode"](
           "jar -xf {jar} org/netbeans/core/startup/Bundle_nb.properties"
           .format(jar=expected_locale), cwd=unpack_path
       )

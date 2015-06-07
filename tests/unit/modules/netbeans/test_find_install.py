@@ -73,12 +73,12 @@ def test_none_found():
 
 
 def test_found_one(mock_salt_test):
-  netbeans.__salt__ = {"cmdmod.retcode": cmdmod.retcode}
+  netbeans.__salt__ = {"cmd.retcode": cmdmod.retcode}
   path = netbeans.find_installation("salt-test", root=tempfile.tempdir)
   assert path == mock_salt_test
 
 
 def test_found_right_version(mock_salt_test, mock_salt_demo):
-  netbeans.__salt__ = {"cmdmod.retcode": cmdmod.retcode}
+  netbeans.__salt__ = {"cmd.retcode": cmdmod.retcode}
   path = netbeans.find_installation("salt-test", root=tempfile.tempdir)
   assert path == mock_salt_test

@@ -39,9 +39,9 @@ def install(name, features='', source_url=None):
   # Look for existing installation.
   exceptions = __salt__["netbeans.exceptions"]()
   try:
-    found = __salt__["netbeans.find_installation"](version)
+    found = __salt__["netbeans.find_installation"](name)
     result["comment"] = "NetBeans {ver} already installed at {path}.".format(
-        path=found, ver=version
+        path=found, ver=name
     )
     result["result"]  = True
     return result
@@ -53,7 +53,7 @@ def install(name, features='', source_url=None):
   installer = None
   try:
     installer = __salt__["netbeans.download_installer"](
-        version, features=features, url=source_url
+        name, features=features, url=source_url
     )
 
   except Exception as ex:
@@ -69,14 +69,14 @@ def install(name, features='', source_url=None):
     return result
 
   # Install in silent mode.
-  install_code = __salt__["cmdmod.retcode"](installer + " --silent")
+  install_code = __salt__["cmd.retcode"](installer + " --silent")
   if install_code != 0:
     result["comment"] = "Installation failed with code {}".format(install_code)
     result["result"]  = False
     return result
 
   # Find the installation path again.
-  install_path = __salt__["netbeans.find_installation"](version)
+  install_path = __salt__["netbeans.find_installation"](name)
   result["comment"] = "Installed version {ver} to {path}.".format(
       path=install_path, ver=name
   )
