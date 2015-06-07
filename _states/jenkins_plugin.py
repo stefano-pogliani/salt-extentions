@@ -180,7 +180,7 @@ class PluginDownloader(object):
 
       (res, comm) = self._download_one(dep)
       comments.append(comm)
-      result = None if res is None else res && result
+      result = None if res is None else res and result
 
     # Build the result.
     return {

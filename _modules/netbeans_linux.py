@@ -124,7 +124,7 @@ def download_installer(version, features='', url=None):
       platform='-linux.sh',
       version=version
   )
-  full_url = _get_installer_url(versio, features=features, url=url)
+  full_url = _get_installer_url(version, features=features, url=url)
   full_path = path.join(tmp, filename)
 
   # Download to {tmp}/{filename}
