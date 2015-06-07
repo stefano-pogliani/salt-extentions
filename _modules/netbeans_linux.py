@@ -13,6 +13,7 @@ import tempfile
 import salt.exceptions
 
 
+__virtualname__ = "netbeans"
 log = logging.getLogger(__name__)
 requests = None
 
@@ -43,7 +44,7 @@ def __virtual__():
     return False
 
   # Check if jar command is available.
-  return "netbeans"
+  return __virtualname__
 
 
 class NoInstallFound(Exception):
