@@ -7,10 +7,13 @@ def __virtual__():
   return "netbeans.exceptions" in __salt__
 
 
-def install(name, features='', source_url=None):
+def install(name, version, features='', source_url=None):
   """Installs the named version of NetBeans on the system.
 
   name:
+    The name of the task, not currently used.
+
+  version:
     The version of NetbBeans to install.
     Currently supports only versions 7.3 and above.
     This is due to the naming of the install file in versions below 7.3.
@@ -39,9 +42,9 @@ def install(name, features='', source_url=None):
   # Look for existing installation.
   exceptions = __salt__["netbeans.exceptions"]()
   try:
-    found = __salt__["netbeans.find_installation"](name)
+    found = __salt__["netbeans.find_installation"](version)
     result["comment"] = "NetBeans {ver} already installed at {path}.".format(
-        path=found, ver=name
+        path=found, ver=version
     )
     result["result"]  = True
     return result
@@ -53,7 +56,7 @@ def install(name, features='', source_url=None):
   installer = None
   try:
     installer = __salt__["netbeans.download_installer"](
-        name, features=features, url=source_url
+        version, features=features, url=source_url
     )
 
   except Exception as ex:
@@ -65,7 +68,7 @@ def install(name, features='', source_url=None):
   if __opts__["test"]:
     result["comment"] = "Installer downloaded to {path}.".format(path=installer)
     result["result"]  = None
-    result["changes"] = {"new": name}
+    result["changes"] = {"new": version}
     return result
 
   # Install in silent mode.
@@ -76,10 +79,10 @@ def install(name, features='', source_url=None):
     return result
 
   # Find the installation path again.
-  install_path = __salt__["netbeans.find_installation"](name)
+  install_path = __salt__["netbeans.find_installation"](version)
   result["comment"] = "Installed version {ver} to {path}.".format(
-      path=install_path, ver=name
+      path=install_path, ver=version
   )
   result["result"]  = True
-  result["changes"] = {"new": name}
+  result["changes"] = {"new": version}
   return result
