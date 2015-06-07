@@ -4,7 +4,7 @@
 
 
 def __virtual__():
-  return "netbeans.find_installation" in __salt__
+  return "netbeans.exceptions" in __salt__
 
 
 def install(name, features='', source_url=None):
@@ -37,6 +37,7 @@ def install(name, features='', source_url=None):
   # Resolve 'latest' version.
 
   # Look for existing installation.
+  exceptions = __salt__["netbeans.exceptions"]()
   try:
     found = __salt__["netbeans.find_installation"](version)
     result["comment"] = "NetBeans {ver} already installed at {path}.".format(
@@ -45,7 +46,7 @@ def install(name, features='', source_url=None):
     result["result"]  = True
     return result
   
-  except __salt__["netbeans.NoInstallFound"]:
+  except exceptions["NoInstallFound"]:
     pass
 
   # Download installer.

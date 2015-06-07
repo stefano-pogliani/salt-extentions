@@ -29,7 +29,14 @@ FILE_FORMAT = "/netbeans-{version}{features}{platform}"
 
 VERSION_RE = re.compile(
     "\s*<[Aa]\s*[hH][rR][eE][fF]\s*=\s*['\"]([0-9][.0-9]*)/?['\"].*>.*"
-);
+)
+
+
+class NoInstallFound(Exception):
+  def __init__(self, version):
+    super(NoInstallFound, self).__init__(
+        "No install path found for version {0}".format(version)
+    )
 
 
 def __virtual__():
@@ -45,13 +52,6 @@ def __virtual__():
 
   # Check if jar command is available.
   return __virtualname__
-
-
-class NoInstallFound(Exception):
-  def __init__(self, version):
-    super(NoInstallFound, self).__init__(
-        "No install path found for version {0}".format(version)
-    )
 
 
 def _pick_latest_version(versions):
@@ -138,6 +138,13 @@ def download_installer(version, features='', url=None):
   # Make executable.
   chmod(full_path, 0755)
   return full_path
+
+
+def exceptions():
+  """Returns a dicrionary with the exceptions exposed by this module."""
+  return {
+    "NoInstallFound": NoInstallFound
+  }
 
 
 def find_installation(version, root='/'):
