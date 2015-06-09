@@ -1,6 +1,9 @@
 # Plugin (install, enable, disable).
 # Upgrade all.
 # Uninstall.
+import logging
+
+log = logging.getlogger(__name__)
 
 
 def __virtual__():
@@ -15,10 +18,11 @@ def _check_version(version):
   """
   # Update cache if needed.
   if _check_version._versions_cache is None:
+    log.debug("Loading versions cache ...")
     _check_version._versions_cache = __salt__["netbeans.list_versions"]()
 
   # Convert latest.
-  if version == "latest":
+  if version is None or version == "latest":
     return __salt__["netbeans.pick_latest_version"](
         _check_version._versions_cache
     )
@@ -124,3 +128,34 @@ def install(name, version, features='', source_url=None):
   result["result"]  = True
   result["changes"] = {"new": version}
   return result
+
+
+def pinstall(name=None, names=None, version=None):
+  """Install and enable a plugin.
+
+  name:
+    The name of the plugin to install.
+
+  names:
+    A list of plugins to install.
+
+  version:
+    The version of NetBeans to install the plugin for.
+    Defaults to latest available.
+  """
+  result = {
+    "changes": None,
+    "comment": "",
+    "name":    name,
+    "result":  False
+  }
+
+  # Resolve version.
+  version = _check_version(version)
+  if version is None:
+    result["comment"] = "Invalid version {} specified.".format(version)
+    result["result"]  = False
+    return result
+
+  #
+  log.debug("~~~ {} - {}".format(name, ", ".join(names or [])))
