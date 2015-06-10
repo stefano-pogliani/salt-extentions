@@ -194,7 +194,7 @@ def pinstall(name=None, version=None):
     fail_comment = "Could not enable plugin."
     test_comment = "Plugin will be enabled."
     result["changes"] = { "state": {
-      "new": "enabled"
+      "new": "enabled",
       "old": "installed"
     } }
 
