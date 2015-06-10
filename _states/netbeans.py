@@ -285,19 +285,19 @@ def start(name, version=None, args=None):
     return result
 
   # Look for the plugin state.
-  exceptions   = __salt__["netbeans.exceptions"]()
+  exceptions = __salt__["netbeans.exceptions"]()
   try:
     nb_path = __salt__["netbeans.find_installation"](version)
     bin  = path.join(nb_path, "bin", "netbeans")
     args = ["--locale", "en", "--nogui", "--nosplash"]
-    code = __salt__["cmd.shell"](bin + " " + " ".join(args) + " &")
+    code = __salt__["cmd.shell"]("nohup " + bin + " " + " ".join(args))
 
     if code == 0:
-      result["comment"] = "Sarted NetBeans in silent mode."
+      result["comment"] = "Started NetBeans in silent mode."
       result["result"]  = True
 
     else:
-      result["comment"] = "Could not sart NetBeans in silent mode."
+      result["comment"] = "Could not start NetBeans in silent mode."
       result["result"]  = False
     return result
 
