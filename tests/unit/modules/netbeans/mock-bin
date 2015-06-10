@@ -1,0 +1,39 @@
+#!/bin/bash
+# Mock netbeans script for unit tests.
+
+# Args
+MODULES=0
+
+### CASES ###
+list_modules() {
+  echo -n "Code Name                                          Version                State                
+-------------------------------------------------- ---------------------- ---------------------
+com.jelastic.plugin.netbeans                       1.1.3                  Available            
+org.netbeans.api.visual                            2.43.1                 Enabled              
+org.netbeans.core.startup                          1.55.2                 Enabled              
+org.netbeans.modules.versioning.core               1.21.1.1.42            Enabled              
+org.netbeans.modules.web.debug                     2.35.1                 Available            
+com.google.code.nb_ldap_explorer.ssl_certificate_e 0.9                    Enabled              
+org.netbeans.modules.mobility.licensing            1.24.1                 Available            
+org.netbeans.modules.nbjunit                       1.83.1                 Upgrade to 1.84.1    
+org.netbeans.modules.glassfish.common              1.63.1                 Available            
+com.MYDevelopers.Cider.Templates                   6.16                   Available
+org.netbeans.modules.php.zend                      1.27.1                 Installed
+-------------------------------------------------- ---------------------- ---------------------
+"
+}
+
+
+### MAIN ###
+while [ $# -ne 0 ]; do
+  arg=$1
+  shift
+
+  case "${arg}" in
+    --modules) MODULES=1;;
+
+    --list)
+      list_modules
+      exit
+  esac
+done

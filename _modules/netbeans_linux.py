@@ -39,6 +39,13 @@ class NoInstallFound(Exception):
     )
 
 
+class NoPluginFound(Exception):
+  def __init__(self, plugin, version):
+    super(NoPluginFound, self).__init__(
+        "Plugin {0} was not found for NetBeans {1}.".format(plugin, version)
+    )
+
+
 def __virtual__():
   if sys.platform != "linux" and sys.platform != "linux2":
     return False
@@ -126,7 +133,8 @@ def download_installer(version, features='', url=None):
 def exceptions():
   """Returns a dicrionary with the exceptions exposed by this module."""
   return {
-    "NoInstallFound": NoInstallFound
+    "NoInstallFound": NoInstallFound,
+    "NoPluginFound":  NoPluginFound
   }
 
 
@@ -195,6 +203,56 @@ def find_installation(version, root='/'):
   # Could not find a valid path.
   raise NoInstallFound(version)
 
+
+def find_plugin(plugin, version, root='/'):
+  """Finds a plugin and its current install state.
+
+  plugin:
+    The name of the plugin to find.
+
+  version:
+    The version of NetBeans to consider.
+
+  root:
+    The root of the tree to scan for the installation.
+    Defaults to /.
+
+  returns:
+    One of the following strings:
+      - enabled: the plugin is installed and enabled.
+      - installed: the plugin is installed.
+      - update: the plugin is installed but it can be updated.
+      - avaiable: the plugin is available but not installed.
+      - unkown: the plugin was listed but the state could not be determined.
+  """
+  # Find NetBeans executable.
+  install_path = find_installation(version, root=root)
+  bin = path.join(install_path, "bin", "netbeans")
+
+  # List plugins.
+  output = __salt__["cmd.run"](bin + " " + " ".join([
+    "--locale", "en",
+    "--nogui",
+    "--modules",
+    "--list"
+  ]))
+  output = output.split('\n')[2:-1]
+
+  # Find requested plugin.
+  for line in output:
+    (name, version, state) = line.split(None, 2)
+    if name != plugin:
+      continue
+
+    state = state.strip().lower()
+    if state.startswith("upgrade to"):
+      return ("update", (version, state[11:]))
+    if state not in ("available", "enabled", "installed"):
+      return ("unknown", version)
+    return (state, version)
+
+  # The plugin was not found in the list.
+  raise NoPluginFound(plugin, version)
 
 def list_versions(url=None):
   """Returns the list of versions of NetBeans that were found.
