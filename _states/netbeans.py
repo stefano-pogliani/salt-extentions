@@ -205,7 +205,7 @@ def pinstall(name=None, version=None):
     fail_comment = "Could not update plugin."
     test_comment = "Plugin will be updated."
     result["changes"] = { "version": {
-      "new": plugin_version[1]
+      "new": plugin_version[1],
       "old": plugin_version[0]
     } }
 
@@ -221,7 +221,7 @@ def pinstall(name=None, version=None):
         "old": "available"
       },
       "version": {
-        "new": plugin_version
+        "new": plugin_version,
         "old": None
       }
     }
