@@ -1,8 +1,7 @@
-# Plugin (install, enable, disable).
+# Plugin (disable).
 # Upgrade all.
 # Uninstall.
 import logging
-from os import path
 
 log = logging.getLogger(__name__)
 
@@ -247,7 +246,16 @@ def pinstall(name=None, version=None):
     "--modules"
   ]
   full_args.extend(args)
-  output = __salt__["cmd.retcode"](bin + " " + " ".join(full_args))
+  retcode = __salt__["netbeans.run"](version, full_args)
+  if retcode == 0:
+    result["comment"] = comment
+    result["result"]  = True
+
+  else:
+    result["comment"] = fail_comment
+    result["result"]  = False
+
+  return result
 
 
 def start(name, version=None, args=None):
@@ -287,10 +295,10 @@ def start(name, version=None, args=None):
   # Look for the plugin state.
   exceptions = __salt__["netbeans.exceptions"]()
   try:
-    nb_path = __salt__["netbeans.find_installation"](version)
-    bin  = path.join(nb_path, "bin", "netbeans")
-    args = ["--locale", "en", "--nogui", "--nosplash"]
-    code = __salt__["cmd.shell"]("nohup " + bin + " " + " ".join(args))
+    code = __salt__["netbeans.run"](
+        version, ["--locale", "en", "--nogui", "--nosplash"],
+        wait=False
+    )
 
     if code == 0:
       result["comment"] = "Started NetBeans in silent mode."
@@ -325,15 +333,17 @@ def stop(name, version=None):
     return result
 
   # Look for the plugin state.
-  exceptions   = __salt__["netbeans.exceptions"]()
+  exceptions = __salt__["netbeans.exceptions"]()
   try:
-    nb_path = __salt__["netbeans.find_installation"](version)
-    native  = path.join(nb_path, "platform", "lib")
-    cmd = (
-        "ps -ef | grep '" + native +
-        "' | grep -v grep | awk '{ print $2 }' | xargs kill"
-    )
-    __salt__["cmd.shell"](cmd)
+    code = __salt__["netbeans.stop"](version)
+    if code == 0:
+      result["comment"] = "Stopped NetBeans."
+      result["result"]  = True
+
+    else:
+      result["comment"] = "Unable to stop NetBeans."
+      result["result"]  = False
+    return result
 
   except exceptions["NoInstallFound"]:
     result["comment"] = "NetBeans {} not installed.".format(version)

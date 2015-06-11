@@ -294,3 +294,46 @@ def pick_latest_version(versions):
   int_versions = [from_string(version) for version in versions]
   latest = max(int_versions)
   return to_string(latest)
+
+
+def run(version, args, headless=True, wait=True, root=None):
+  """Runs a NetBeans command.
+
+  version:
+    The version of netbeans to run.
+
+  args:
+    Array of arguments to pass to Netbeans.
+
+  headless:
+    Run NetBeans in headless mode.
+
+  wait:
+    If True, waits for the command to terminate.
+    Returns immediately otherwise.
+
+  root:
+    Root tree to search the installation in.
+  """
+  args = args or []
+  if headless:
+    args.append("-J-Djava.awt.headless=True")
+
+  if wait:
+    nb_path = find_installation(version, root=root)
+    bin = path.join(nb_path, "bin", "netbeans")
+    args = " ".join(args)
+    return __salt__["cmd.retcode"](bin + " " + args)
+
+  # TODO: explictly use subprocesses to avoid blocking.
+  return 2
+
+
+def stop(version, root=None):
+  nb_path = __salt__["netbeans.find_installation"](version)
+  native  = path.join(nb_path, "platform", "lib")
+  cmd = (
+      "ps -ef | grep '" + native +
+      "' | grep -v grep | awk '{ print $2 }' | xargs kill"
+  )
+  return __salt__["cmd.shell"](cmd)
