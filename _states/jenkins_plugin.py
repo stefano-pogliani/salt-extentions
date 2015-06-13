@@ -155,7 +155,7 @@ class PluginDownloader(object):
     resolved_deps.append(name)
     return resolved_deps
 
-  def download(self, name, changes):
+  def download(self, name):
     """Starts the download routine.
     :returns: the overall state of the operation, the comment and the changes made.
     """
