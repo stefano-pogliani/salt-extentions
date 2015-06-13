@@ -105,7 +105,7 @@ class PluginDownloader(object):
     :returns: The installed version or None if the plugin is not installed.
     """
     metadata_location = os.path.join(
-        home, "plugins", name, "META-INF", "MANIFEST.MF"
+        self._home, "plugins", name, "META-INF", "MANIFEST.MF"
     )
     if not os.path.exists(metadata_location):
       return None
