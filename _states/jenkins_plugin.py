@@ -178,7 +178,9 @@ class PluginDownloader(object):
         comments.append("Plugin {name} up to date.".format(name=dep))
         continue
 
-      (res, comm) = self._download_one(dep)
+      (res, comm) = self._download_one(
+          dep, changes[dep]['new'], changes[dep]['old']
+      )
       comments.append(comm)
       result = None if res is None else res and result
 
